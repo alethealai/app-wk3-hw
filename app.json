@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "scheme": "acme",
+    "plugins": [
+      "expo-router"
+    ],
+    "name": "app-wk3-hw",
+    "slug": "app-wk3-hw"
+  }
+}
