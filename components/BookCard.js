@@ -14,7 +14,7 @@ export default function BookCard({ book }) {
             stars.push(
                 <Ionicons 
                     key={i} 
-                    name={isFilled ? "star" : "star-outline"} 
+                    name="star" 
                     color={isFilled ? "#FFD700" : "#ccc"} 
                     size={14} 
                 />

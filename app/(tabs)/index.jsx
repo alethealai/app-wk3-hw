@@ -39,7 +39,7 @@ const NewestBooks = [
     image: require('../../assets/img/app course - book app (android)-5/img_book_tbos.png'),
     title: 'The Book of Signs',
     author: 'Rudolf Koch',
-    rating: 4,
+    rating: 3,
     description: "A comprehensive collection of symbols and their meanings, exploring the rich tapestry of human communication through signs and symbols.",
   },
   {
@@ -47,7 +47,7 @@ const NewestBooks = [
     image: require('../../assets/img/app course - book app (android)-6/img_book_stitchedup.png'),
     title: 'Stitched Up',
     author: 'Tansy E. Hoskins',
-    rating: 4,
+    rating: 3,
     description: "A critical examination of the fashion industry, revealing the hidden costs of fast fashion and advocating for a more sustainable and ethical approach to clothing production and consumption.",
   },
 ];
@@ -55,13 +55,22 @@ const NewestBooks = [
 export default function HomeScreen() {
   const router = useRouter();
 
-   const renderbookcard = ({ item }) => {
-    return <BookCard book={item} />;
-  };
-  
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.sectionTitle}>Popular Books</Text>
+    <View style={styles.outerContainer}>
+      {/* 設定頂部的漢堡選單與搜尋圖示 */}
+      <Stack.Screen 
+        options={{ 
+          headerShown: true,
+          title: '',
+          headerLeft: () => <Ionicons name="menu" size={28} style={{ marginLeft: 20 }} />,
+          headerRight: () => <Ionicons name="search" size={24} style={{ marginRight: 20 }} />,
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: '#fff' },
+        }} 
+      />
+
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <Text style={styles.sectionTitle}>Popular Books</Text>
         <ScrollView 
           horizontal 
           showsHorizontalScrollIndicator={false} 
@@ -83,60 +92,54 @@ export default function HomeScreen() {
           ))}
         </ScrollView>
 
-      <Text style={styles.sectionTitle}>Newest</Text>
-      
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        contentContainerStyle={{ paddingLeft: 20, paddingRight: 20 }}
-      >
-       
-       {NewestBooks.map((item) => (
-        <BookCard key={item.id} book={item} />
-        ))}
+        <Text style={styles.sectionTitle}>Newest</Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 40 }}
+        >
+          {NewestBooks.map((item) => (
+  <Pressable 
+    key={item.id} 
+    onPress={() => router.push({
+      pathname: `/(tabs)/books/${item.id}`,
+      params: { 
+        id: item.id,
+        title: item.title,
+        author: item.author,
+        description: item.description,
+        rating: item.rating,
+        image: item.image, // 確保這行有傳
+      }
+    })}
+  >
+    <BookCard book={item} />
+  </Pressable>
+))}
+        </ScrollView>
       </ScrollView>
-
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  outerContainer: { 
-    flex: 1, 
-    backgroundColor: '#fff' 
-  },
+  outerContainer: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1 },
   sectionTitle: { 
     fontSize: 24, 
     fontWeight: 'bold', 
     marginHorizontal: 20, 
-    marginTop: 25, 
+    marginTop: 10, 
     marginBottom: 15 
   },
-  popularList: { 
-    paddingLeft: 20, 
-    paddingBottom: 20 
-  },
-  popularCard: { 
-    marginRight: 20, 
-    width: 140,
-  },
+  popularList: { paddingLeft: 20, paddingBottom: 20 },
+  popularCard: { marginRight: 20, width: 140 },
   popularImage: { 
     width: 140,  
     height: 200, 
     borderRadius: 8,
     backgroundColor: '#f0f0f0', 
   },
-  
-  newestList: { 
-    paddingLeft: 20, 
-    paddingBottom: 40 
-  },
-  bookTitle: { 
-    fontSize: 16, 
-    marginTop: 10 
-  },
-  bookAuthor: { 
-    fontSize: 12, 
-    color: 'gray' 
-  }
+  bookTitle: { fontSize: 16, marginTop: 10, fontWeight: '600' },
+  bookAuthor: { fontSize: 12, color: 'gray' }
 });

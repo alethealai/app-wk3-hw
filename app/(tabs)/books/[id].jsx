@@ -1,121 +1,97 @@
-import { View, Text, Image, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { useLocalSearchParams, Stack } from 'expo-router'; // 引入 Stack 控制標題 [cite: 719]
+import { useState } from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function BookDetail() {
-   
-  const { title, author, image, description, rating } = useLocalSearchParams(); 
+  const book = useLocalSearchParams();
+  const router = useRouter();
 
-  
-  const renderStars = () => {
-    let stars = [];
-    const currentRating = parseFloat(rating) || 0; 
-    for (let i = 1; i <= 5; i++) {
-      const isFilled = i <= currentRating;
-      stars.push(
-        <Ionicons 
-          key={i} 
-          name={isFilled ? "star" : "star-outline"} 
-          color={isFilled ? "#FFD700" : "#ccc"} 
-          size={18} 
-        />
-      );
-    }
-    return stars;
-  };
-
+const [isFavorite, setIsFavorite] = useState(false);
+const imageSource = typeof book.image === 'string' ? Number(book.image) : book.image;
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <Stack.Screen options={{ title: 'Book Info', headerBackTitle: 'Back' }} />
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <Stack.Screen 
+        options={{
+          headerShown: true,
+          title: '',
+          headerLeft: () => (
+            <Pressable onPress={() => router.back()} style={{ marginLeft: 15 }}>
+              <Ionicons name="chevron-back" size={28} color="black" />
+            </Pressable>
+          ),
+          headerRight: () => (
+            <Pressable 
+              onPress={() => setIsFavorite(!isFavorite)} 
+              style={{ marginRight: 20 }}
+            >
+              <Ionicons 
+                // 根據狀態切換圖示名稱與顏色
+                name={isFavorite ? "bookmark" : "bookmark-outline"} 
+                size={26} 
+                color={isFavorite ? "#6200EE" : "black"} 
+              />
+            </Pressable>
+          ),
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: '#fff' },
+        }} 
+      />
 
-      <ScrollView contentContainerStyle={styles.container}>
-
-        <Image source={image} style={styles.cover} />
+      <ScrollView contentContainerStyle={styles.content}>
+        <Image source={book.image} style={styles.bookImage} />
         
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.author}>{author}</Text>
+        <Text style={styles.title}>{book.title}</Text>
+        <Text style={styles.author}>{book.author}</Text>
+        
         
         <View style={styles.ratingRow}>
-            <View style={styles.stars}>{renderStars()}</View>
-            <Text style={styles.ratingText}> {rating}.0 / 5.0</Text>
+          {[1, 2, 3, 4].map((i) => (
+            <Ionicons key={i} name="star" size={18} color="#FFD700" />
+          ))}
+          <Ionicons name="star" size={18} color="#ccc" />
+          <Text style={styles.ratingText}> 4.0 / 5.0</Text>
         </View>
 
-        <Text style={styles.description}>
-          {description}
-        </Text>
+        <Text style={styles.description}>{book.description}</Text>
 
-        <Pressable 
-          style={({ pressed }) => [
-            styles.buyButton,
-            { opacity: pressed ? 0.8 : 1 }
-          ]}
-          onPress={() => alert('Added to cart!')}
-        >
-          <Text style={styles.buyText}>BUY NOW FOR $46.99</Text>
+        <Pressable style={styles.buyButton}>
+          <Text style={styles.buyButtonText}>BUY NOW FOR $46.99</Text>
         </Pressable>
-
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
+  content: { 
     alignItems: 'center', 
-    padding: 20 
+    paddingHorizontal: 25,
+    paddingBottom: 40 
   },
-
-  cover: { 
-    width: 210, 
-    height: 300, 
+  bookImage: { 
+    width: 220, 
+    height: 320, 
     borderRadius: 12, 
-    marginTop: 10 
+    marginTop: 10,
+    marginBottom: 20 
   },
-
-  title: { 
-    fontSize: 24,
-    fontWeight: 'bold', 
-    marginTop: 20, 
-    textAlign: 'center' 
-  },
-
-  author: { 
-    fontSize: 16, 
-    color: 'gray', 
-    marginVertical: 5 
-  },
-
-  ratingRow: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginVertical: 10 
-  },
-
-  stars: { flexDirection: 'row' },
-
-  ratingText: { 
-    fontSize: 16, 
-    color: '#666', 
-    marginLeft: 8 
-  },
-
+  title: { fontSize: 26, fontWeight: 'bold', marginBottom: 5, textAlign: 'center' },
+  author: { fontSize: 16, color: 'gray', marginBottom: 15 },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  ratingText: { marginLeft: 10, color: 'gray', fontSize: 14 },
   description: { 
     textAlign: 'center', 
-    color: '#444', 
-    lineHeight: 24, 
-    marginVertical: 20, 
-    paddingHorizontal: 10 },
-  
-  buyButton: { 
-    backgroundColor: '#6200EE', 
-    paddingVertical: 16, 
-    paddingHorizontal: 60, 
-    borderRadius: 30,
-    marginTop: 20,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 5
+    lineHeight: 22, 
+    color: '#666', 
+    marginBottom: 30 
   },
-  buyText: { color: 'white', fontWeight: 'bold', fontSize: 18 }
+  buyButton: {
+    backgroundColor: '#6200EE',
+    paddingVertical: 15,
+    borderRadius: 12,
+    width: '100%',
+    alignItems: 'center'
+  },
+  buyButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }
 });
